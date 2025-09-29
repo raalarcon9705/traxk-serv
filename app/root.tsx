@@ -6,8 +6,13 @@ import {
   Scripts,
   ScrollRestoration,
 } from "react-router";
+import { useEffect } from "react";
 
 import type { Route } from "./+types/root";
+import { AuthProvider } from "~/lib/auth";
+import { ThemeProvider } from "~/lib/ThemeProvider";
+import { ClientThemeHandler } from "~/components/ClientThemeHandler";
+import { PWAInstallPrompt } from "~/components/PWAInstallPrompt";
 import "./app.css";
 
 export const links: Route.LinksFunction = () => [
@@ -21,18 +26,48 @@ export const links: Route.LinksFunction = () => [
     rel: "stylesheet",
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
+  { rel: "icon", href: "/favicon.ico" },
+  { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
+  { rel: "apple-touch-icon-precomposed", href: "/apple-touch-icon-precomposed.png" },
+  { rel: "mask-icon", href: "/apple-touch-icon.png", color: "#1e40af" },
+  { rel: "manifest", href: "/manifest.webmanifest" },
 ];
 
 export function Layout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en">
+    <html lang="es">
       <head>
         <meta charSet="utf-8" />
-        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
+        <meta name="theme-color" content="#1e40af" />
+        <meta name="robots" content="index, follow" />
+        <meta name="author" content="TrackServ" />
+        <meta name="application-name" content="TrackServ" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-title" content="TrackServ" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="msapplication-TileColor" content="#1e40af" />
+        <meta name="msapplication-tap-highlight" content="no" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-touch-fullscreen" content="yes" />
+        <meta name="apple-mobile-web-app-orientations" content="portrait" />
+        <meta name="description" content="Gestión de comisiones de proveedores de servicios" />
+        <meta name="keywords" content="comisiones, proveedores, servicios, TrackServ" />
+        <meta name="og:title" content="TrackServ" />
+        <meta name="og:description" content="Gestión de comisiones de proveedores de servicios" />
+        <meta name="og:image" content="/favicon.ico" />
+        <meta name="og:url" content="https://trackserv.com" />
+        <meta name="og:type" content="website" />
+
+
+        <title>TrackServ</title>
         <Meta />
         <Links />
+        
       </head>
-      <body>
+      <body className="ios-safe-area">
         {children}
         <ScrollRestoration />
         <Scripts />
@@ -42,7 +77,37 @@ export function Layout({ children }: { children: React.ReactNode }) {
 }
 
 export default function App() {
-  return <Outlet />;
+
+  useEffect(() => {
+    // iOS Safari address bar hiding - only in standalone mode
+    if (/iPad|iPhone|iPod/.test(navigator.userAgent) && window.matchMedia('(display-mode: standalone)').matches) {
+      const hideAddressBar = () => {
+        setTimeout(() => {
+          window.scrollTo(0, 1);
+        }, 100);
+      };
+      
+      // Hide address bar on load
+      hideAddressBar();
+      
+      // Hide address bar on orientation change
+      window.addEventListener('orientationchange', hideAddressBar);
+      
+      return () => {
+        window.removeEventListener('orientationchange', hideAddressBar);
+      };
+    }
+  }, []);
+
+  return (
+    <ThemeProvider>
+      <AuthProvider>
+        <ClientThemeHandler />
+        <PWAInstallPrompt />
+        <Outlet />
+      </AuthProvider>
+    </ThemeProvider>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {
