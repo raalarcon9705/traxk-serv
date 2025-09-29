@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useAuth } from '~/lib/auth'
 import { useLanguage } from '~/lib/hooks/useLanguage'
 import { Button } from '~/components/ui/Button'
@@ -28,10 +28,36 @@ export default function Auth() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
+  const [isCheckingAuth, setIsCheckingAuth] = useState(true)
   
-  const { signIn, signUp } = useAuth()
+  const { user, signIn, signUp } = useAuth()
   const { t } = useLanguage()
   const navigate = useNavigate()
+
+  // Redirect authenticated users to dashboard
+  useEffect(() => {
+    if (user) {
+      navigate('/dashboard')
+    } else {
+      setIsCheckingAuth(false)
+    }
+  }, [user, navigate])
+
+  // Show loading while checking authentication
+  if (isCheckingAuth) {
+    return (
+      <div className="min-h-screen flex flex-col justify-center py-16 sm:py-20 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: 'hsl(var(--background))' }}>
+        <div className="sm:mx-auto sm:w-full sm:max-w-md">
+          <div className="text-center">
+            <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+            <p className="mt-4 text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
+              {t('common.loading')}
+            </p>
+          </div>
+        </div>
+      </div>
+    )
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()

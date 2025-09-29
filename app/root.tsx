@@ -28,9 +28,9 @@ export const links: Route.LinksFunction = () => [
     href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
   },
   { rel: "icon", href: "/favicon.ico" },
-  { rel: "apple-touch-icon", href: "/apple-touch-icon.png" },
-  { rel: "apple-touch-icon-precomposed", href: "/apple-touch-icon-precomposed.png" },
-  { rel: "mask-icon", href: "/apple-touch-icon.png", color: "#1e40af" },
+  { rel: "apple-touch-icon", href: "/icons/apple-touch-icon.png" },
+  { rel: "apple-touch-icon-precomposed", href: "/icons/apple-touch-icon.png" },
+  { rel: "mask-icon", href: "/icons/apple-touch-icon.png", color: "#10B981" },
   { rel: "manifest", href: "/manifest.webmanifest" },
 ];
 
@@ -40,18 +40,19 @@ export function Layout({ children }: { children: React.ReactNode }) {
       <head>
         <meta charSet="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no" />
-        <meta name="theme-color" content="#1e40af" />
+        <meta name="theme-color" content="#10B981" />
+        <meta name="theme-color" media="(prefers-color-scheme: light)" content="#10B981" />
+        <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#059669" />
         <meta name="robots" content="index, follow" />
         <meta name="author" content="TrackServ" />
         <meta name="application-name" content="TrackServ" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
         <meta name="apple-mobile-web-app-title" content="TrackServ" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
-        <meta name="msapplication-TileColor" content="#1e40af" />
+        <meta name="msapplication-TileColor" content="#10B981" />
         <meta name="msapplication-tap-highlight" content="no" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-touch-fullscreen" content="yes" />
         <meta name="apple-mobile-web-app-orientations" content="portrait" />
         <meta name="description" content="Gestión de comisiones de proveedores de servicios" />
@@ -68,7 +69,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
         <Links />
         
       </head>
-      <body className="ios-safe-area">
+      <body className="ios-safe-area app-container">
         {children}
         <ScrollRestoration />
         <Scripts />

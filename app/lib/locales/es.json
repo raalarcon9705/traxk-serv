@@ -232,7 +232,8 @@
     "businessNameRequired": "El nombre del negocio es requerido",
     "commissionRateRequired": "La tasa de comisión es requerida",
     "commissionRateInvalid": "La tasa de comisión debe ser un número válido",
-    "settingsSaved": "Configuración guardada exitosamente"
+    "settingsSaved": "Configuración guardada exitosamente",
+    "example": "Ejemplo: Si cobras $100 y tu comisión es {{rate}}%, recibirás {{netAmount}} ({{commissionAmount}} de comisión)"
   },
   "pwa": {
     "installTitle": "Instalar TrackServ",

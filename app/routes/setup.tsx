@@ -81,34 +81,34 @@ export default function Setup() {
 
   return (
     <Layout requireAuth={true} requireServiceProvider={false}>
-      <div className="min-h-screen" style={{ backgroundColor: 'hsl(var(--background))' }}>
-        <div className="flex flex-col justify-center py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
-          <div className="sm:mx-auto sm:w-full sm:max-w-4xl">
-            <h2 className="mt-6 text-center text-3xl font-extrabold" style={{ color: 'hsl(var(--foreground))' }}>
-              {serviceProvider ? t('setup.title') : t('setup.title')}
-            </h2>
-            <p className="mt-2 text-center text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
-              {serviceProvider 
-                ? 'Atualize as informações do seu perfil de prestador de serviços'
-                : 'Configure seu perfil de prestador de serviços'
-              }
-            </p>
-          </div>
+      <div className="min-h-screen bg-gray-50">
+        <div className="flex flex-col justify-center py-8 sm:py-12 lg:py-16 px-4 sm:px-6 lg:px-8">
+          <div className="mx-auto w-full max-w-2xl">
+            <div className="text-center mb-6 sm:mb-8">
+              <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-dark-blue-900">
+                {serviceProvider ? t('setup.title') : t('setup.title')}
+              </h1>
+              <p className="mt-2 text-sm sm:text-base text-dark-blue-600">
+                {serviceProvider 
+                  ? 'Atualize as informações do seu perfil de prestador de serviços'
+                  : 'Configure seu perfil de prestador de serviços'
+                }
+              </p>
+            </div>
 
-          <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-4xl">
-            {showLanguageCurrency ? (
-              <LanguageCurrencySelector 
-                onClose={() => setShowLanguageCurrency(false)}
-                showTitle={false}
-              />
-            ) : (
-              <div className="space-y-6">
+            <div className="w-full">
+              {showLanguageCurrency ? (
+                <LanguageCurrencySelector 
+                  onClose={() => setShowLanguageCurrency(false)}
+                  showTitle={false}
+                />
+              ) : (
                 <Card>
                   <CardHeader className="space-y-1">
-                    <CardTitle className="text-xl">
+                    <CardTitle className="text-lg sm:text-xl">
                       {t('setup.title')}
                     </CardTitle>
-                    <CardDescription>
+                    <CardDescription className="text-sm sm:text-base">
                       {serviceProvider 
                         ? 'Atualize as informações básicas do seu negócio'
                         : 'Complete as informações básicas do seu negócio'
@@ -116,9 +116,9 @@ export default function Setup() {
                     </CardDescription>
                   </CardHeader>
                   <CardContent>
-                    <form onSubmit={handleSubmit} className="space-y-6">
+                    <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
                       {error && (
-                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                        <div className="bg-red-50 border border-red-200 text-red-700 px-3 sm:px-4 py-2 sm:py-3 rounded text-sm">
                           {error}
                         </div>
                       )}
@@ -145,26 +145,28 @@ export default function Setup() {
                         />
                       </div>
                       
-                      <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded">
-                        <p className="text-sm">
-                          <strong>Exemplo:</strong> Se você cobra R$100 e sua comissão é {commissionRate}%, 
-                          receberá {formatCurrency(Math.round(10000 * (1 - parseFloat(commissionRate) / 100)))} 
-                          ({formatCurrency(Math.round(10000 * parseFloat(commissionRate) / 100))} de comissão)
+                      <div className="bg-blue-50 border border-blue-200 text-blue-700 px-3 sm:px-4 py-2 sm:py-3 rounded">
+                        <p className="text-xs sm:text-sm">
+                          {t('setup.example', {
+                            rate: commissionRate,
+                            netAmount: formatCurrency(Math.round(10000 * (1 - parseFloat(commissionRate) / 100))),
+                            commissionAmount: formatCurrency(Math.round(10000 * parseFloat(commissionRate) / 100))
+                          })}
                         </p>
                       </div>
                       
-                      <div className="flex gap-4">
+                      <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
                         <Button
                           type="button"
                           variant="outline"
                           onClick={() => setShowLanguageCurrency(true)}
-                          className="flex-1"
+                          className="w-full sm:flex-1"
                         >
                           {t('setup.language')} / {t('setup.currency')}
                         </Button>
                         <Button
                           type="submit"
-                          className="flex-1"
+                          className="w-full sm:flex-1"
                           loading={loading}
                           disabled={loading}
                         >
@@ -174,8 +176,8 @@ export default function Setup() {
                     </form>
                   </CardContent>
                 </Card>
-              </div>
-            )}
+              )}
+            </div>
           </div>
         </div>
       </div>

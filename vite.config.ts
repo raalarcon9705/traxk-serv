@@ -11,7 +11,7 @@ export default defineConfig({
     tsconfigPaths(),
     VitePWA({
       registerType: 'autoUpdate',
-      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'manifest-icon-192.maskable.png', 'manifest-icon-512.maskable.png'],
+      includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'apple-touch-icon-precomposed.png', 'apple-touch-icon-120x120.png', 'apple-touch-icon-120x120-precomposed.png', 'icons/manifest-icon-192.maskable.png', 'icons/manifest-icon-512.maskable.png'],
       devOptions: {
         enabled: true
       },
@@ -19,32 +19,32 @@ export default defineConfig({
         name: 'TrackServ - Gestión de Servicios',
         short_name: 'TrackServ',
         description: 'Gestión de comisiones de proveedores de servicios',
-        theme_color: '#1e40af',
+        theme_color: '#10B981',
         background_color: '#ffffff',
         display: 'standalone',
         scope: '/',
         start_url: '/',
         icons: [
           {
-            src: 'pwa-192x192.png',
+            src: 'icons/pwa-192x192.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'any'
           },
           {
-            src: 'pwa-512x512.png',
+            src: 'icons/pwa-512x512.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'any'
           },
           {
-            src: 'manifest-icon-192.maskable.png',
+            src: 'icons/manifest-icon-192.maskable.png',
             sizes: '192x192',
             type: 'image/png',
             purpose: 'maskable'
           },
           {
-            src: 'manifest-icon-512.maskable.png',
+            src: 'icons/manifest-icon-512.maskable.png',
             sizes: '512x512',
             type: 'image/png',
             purpose: 'maskable'

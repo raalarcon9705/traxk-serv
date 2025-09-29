@@ -1,3 +1,4 @@
+import { useEffect } from 'react'
 import { useAuth } from '~/lib/auth'
 import { useServiceProvider } from '~/lib/hooks/useServiceProvider'
 import { useServices } from '~/lib/hooks/useServices'
@@ -9,7 +10,7 @@ import { Button } from '~/components/ui/Button'
 import { Layout } from '~/components/Layout'
 import { ClientChart } from '~/components/ClientChart'
 import { Plus, Users, DollarSign, Calendar, TrendingUp, BarChart3, CheckCircle, Clock } from 'lucide-react'
-import { Link } from 'react-router'
+import { Link, useNavigate } from 'react-router'
 import type { Route } from "./+types/dashboard";
 
 export function meta({}: Route.MetaArgs) {
@@ -33,6 +34,32 @@ export default function Dashboard() {
   const { monthlyData, loading: historyLoading } = useServiceHistory()
   const { t } = useLanguage()
   const { formatCurrency } = useCurrency()
+  const navigate = useNavigate()
+
+  // Redirect unauthenticated users to auth page
+  useEffect(() => {
+    if (!user) {
+      navigate('/auth')
+    }
+  }, [user, navigate])
+
+  // Show loading while checking authentication
+  if (!user) {
+    return (
+      <Layout requireAuth={true} requireServiceProvider={true}>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
+          <div className="flex items-center justify-center min-h-[400px]">
+            <div className="text-center">
+              <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600 mx-auto"></div>
+              <p className="mt-4 text-sm text-gray-600">
+                {t('common.loading')}
+              </p>
+            </div>
+          </div>
+        </div>
+      </Layout>
+    )
+  }
 
   // Current period stats
   const totalAmount = services.reduce((sum, service) => sum + service.amount + (service.tip_amount || 0), 0)
