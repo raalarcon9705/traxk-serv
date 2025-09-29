@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router'
 import { useClients } from '~/lib/hooks/useClients'
+import { useLanguage } from '~/lib/hooks/useLanguage'
 import { Layout } from '~/components/Layout'
 import { Button } from '~/components/ui/Button'
 import { Input } from '~/components/ui/Input'
@@ -37,6 +38,7 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Clients() {
   const { clients, loading, error, createClient, updateClient, deleteClient } = useClients()
+  const { t } = useLanguage()
   const [searchTerm, setSearchTerm] = useState('')
   const [showCreateForm, setShowCreateForm] = useState(false)
   const [newClientName, setNewClientName] = useState('')
@@ -61,7 +63,7 @@ export default function Clients() {
       setNewClientName('')
       setShowCreateForm(false)
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'Error al crear cliente')
+      setSubmitError(err instanceof Error ? err.message : t('clients.errorCreating'))
     } finally {
       setIsSubmitting(false)
     }
@@ -79,19 +81,19 @@ export default function Clients() {
       setEditingClient(null)
       setEditName('')
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'Error al actualizar cliente')
+      setSubmitError(err instanceof Error ? err.message : t('clients.errorUpdating'))
     } finally {
       setIsSubmitting(false)
     }
   }
 
   const handleDeleteClient = async (id: string) => {
-    if (!confirm('¿Estás seguro de que quieres eliminar este cliente?')) return
+    if (!confirm(t('clients.confirmDelete'))) return
 
     try {
       await deleteClient(id)
     } catch (err) {
-      setSubmitError(err instanceof Error ? err.message : 'Error al eliminar cliente')
+      setSubmitError(err instanceof Error ? err.message : t('clients.errorDeleting'))
     }
   }
 
@@ -147,7 +149,7 @@ export default function Clients() {
       <Layout requireAuth={true} requireServiceProvider={true}>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-8">
           <Alert variant="destructive">
-            <h3 className="font-medium">Error al cargar clientes</h3>
+            <h3 className="font-medium">{t('clients.errorLoading')}</h3>
             <p className="text-sm">{error}</p>
           </Alert>
         </div>
@@ -162,9 +164,9 @@ export default function Clients() {
         <div className="mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-dark-blue-900">Clientes</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-dark-blue-900">{t('clients.title')}</h1>
               <p className="mt-1 sm:mt-2 text-dark-blue-600 text-sm sm:text-base">
-                Gestiona tu lista de clientes ({clients.length} clientes)
+                {t('clients.manageClients')} ({clients.length} {t('clients.clientCount')})
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
@@ -173,8 +175,8 @@ export default function Clients() {
                 className="w-full sm:w-auto"
               >
                 <Plus className="mr-2 h-4 w-4" />
-                <span className="hidden sm:inline">Agregar Cliente</span>
-                <span className="sm:hidden">Agregar</span>
+                <span className="hidden sm:inline">{t('clients.addClient')}</span>
+                <span className="sm:hidden">{t('clients.addClient')}</span>
               </Button>
             </div>
           </div>
@@ -185,7 +187,7 @@ export default function Clients() {
           <div className="relative">
             <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
             <Input
-              placeholder="Buscar clientes..."
+              placeholder={t('clients.searchClients')}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
@@ -197,9 +199,9 @@ export default function Clients() {
         {showCreateForm && (
           <Card className="mb-6">
             <CardHeader>
-              <CardTitle>Agregar Nuevo Cliente</CardTitle>
+              <CardTitle>{t('clients.addNewClient')}</CardTitle>
               <CardDescription>
-                Crea un nuevo cliente en tu lista
+                {t('clients.createNewClient')}
               </CardDescription>
             </CardHeader>
             <CardContent>
@@ -211,11 +213,11 @@ export default function Clients() {
                 )}
                 
                 <Input
-                  label="Nombre del Cliente"
+                  label={t('clients.clientName')}
                   value={newClientName}
                   onChange={(e) => setNewClientName(e.target.value)}
                   required
-                  placeholder="Ej: Juan Pérez"
+                  placeholder={t('clients.clientNamePlaceholder')}
                 />
                 
                 <div className="flex gap-2">
@@ -224,7 +226,7 @@ export default function Clients() {
                     loading={isSubmitting}
                     disabled={isSubmitting || !newClientName.trim()}
                   >
-                    Crear Cliente
+                    {t('clients.createClient')}
                   </Button>
                   <Button
                     type="button"
@@ -235,7 +237,7 @@ export default function Clients() {
                       setSubmitError('')
                     }}
                   >
-                    Cancelar
+                    {t('common.cancel')}
                   </Button>
                 </div>
               </form>
@@ -249,12 +251,12 @@ export default function Clients() {
             <CardContent className="text-center py-12">
               <Users className="mx-auto h-12 w-12 text-gray-400" />
               <h3 className="mt-4 text-lg font-medium text-gray-900">
-                {searchTerm ? 'No se encontraron clientes' : 'No hay clientes'}
+                {searchTerm ? t('clients.noClientsFound') : t('clients.noClients')}
               </h3>
               <p className="mt-2 text-gray-500">
                 {searchTerm 
-                  ? 'Intenta con otro término de búsqueda'
-                  : 'Comienza agregando tu primer cliente'
+                  ? t('clients.noClientsMessage')
+                  : t('clients.noClientsStart')
                 }
               </p>
               {!searchTerm && (
@@ -263,7 +265,7 @@ export default function Clients() {
                   className="mt-4"
                 >
                   <Plus className="mr-2 h-4 w-4" />
-                  Agregar Primer Cliente
+                  {t('clients.addFirstClient')}
                 </Button>
               )}
             </CardContent>
@@ -282,11 +284,11 @@ export default function Clients() {
                       )}
                       
                       <Input
-                        label="Nombre del Cliente"
+                        label={t('clients.clientName')}
                         value={editName}
                         onChange={(e) => setEditName(e.target.value)}
                         required
-                        placeholder="Ej: Juan Pérez"
+                        placeholder={t('clients.clientNamePlaceholder')}
                       />
                       
                       <div className="flex gap-2">
@@ -295,14 +297,14 @@ export default function Clients() {
                           loading={isSubmitting}
                           disabled={isSubmitting || !editName.trim()}
                         >
-                          Guardar
+                          {t('common.save')}
                         </Button>
                         <Button
                           type="button"
                           variant="outline"
                           onClick={cancelEditing}
                         >
-                          Cancelar
+                          {t('common.cancel')}
                         </Button>
                       </div>
                     </form>
@@ -313,7 +315,7 @@ export default function Clients() {
                           {client.name}
                         </h3>
                         <p className="text-sm text-gray-500">
-                          Cliente desde {client.created_at ? new Date(client.created_at).toLocaleDateString() : 'Fecha desconocida'}
+                          {t('clients.clientSince')} {client.created_at ? new Date(client.created_at).toLocaleDateString() : t('clients.unknownDate')}
                         </p>
                       </div>
                       
@@ -325,7 +327,7 @@ export default function Clients() {
                           className="text-dark-blue-600 hover:text-dark-blue-700"
                         >
                           <Edit className="h-4 w-4" />
-                          <span className="sr-only">Editar</span>
+                          <span className="sr-only">{t('common.edit')}</span>
                         </Button>
                         <Button
                           variant="ghost"
@@ -334,7 +336,7 @@ export default function Clients() {
                           className="text-red-600 hover:text-red-700"
                         >
                           <Trash2 className="h-4 w-4" />
-                          <span className="sr-only">Eliminar</span>
+                          <span className="sr-only">{t('common.delete')}</span>
                         </Button>
                       </div>
                     </div>

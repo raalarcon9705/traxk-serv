@@ -2,10 +2,11 @@ import { useState, useEffect } from 'react'
 import { useClients } from '~/lib/hooks/useClients'
 import { useServices } from '~/lib/hooks/useServices'
 import { usePaymentPeriods } from '~/lib/hooks/usePaymentPeriods'
+import { useLanguage } from '~/lib/hooks/useLanguage'
 import { Button } from '~/components/ui/Button'
 import { Input } from '~/components/ui/Input'
+import { MoneyInput } from '~/components/ui/MoneyInput'
 import { Autocomplete } from '~/components/ui/Autocomplete'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/Card'
 import { Layout } from '~/components/Layout'
 import { useNavigate } from 'react-router'
 import { ArrowLeft } from 'lucide-react'
@@ -14,14 +15,7 @@ import type { Route } from "./+types/services.new";
 export function meta({}: Route.MetaArgs) {
   return [
     { title: "Nuevo Servicio - TrackServ" },
-    { name: "description", content: "Agrega un nuevo servicio a tu cartera. Registra detalles del servicio, cliente, monto y fecha para un mejor control de comisiones." },
-    { name: "keywords", content: "nuevo servicio, agregar, servicio, comisiones, TrackServ, registro" },
-    { property: "og:title", content: "Nuevo Servicio - TrackServ" },
-    { property: "og:description", content: "Agrega un nuevo servicio a tu cartera" },
-    { property: "og:type", content: "website" },
-    { name: "twitter:card", content: "summary" },
-    { name: "twitter:title", content: "Nuevo Servicio - TrackServ" },
-    { name: "twitter:description", content: "Agrega un nuevo servicio a tu cartera" }
+    { name: "description", content: "Agrega un nuevo servicio a tu cartera. Registra detalles del servicio, cliente, monto y fecha para un mejor control de comisiones." }
   ];
 }
 
@@ -29,8 +23,8 @@ export default function NewService() {
   const [clientName, setClientName] = useState('')
   const [selectedClient, setSelectedClient] = useState<{ id: string; name: string } | null>(null)
   const [serviceDescription, setServiceDescription] = useState('')
-  const [amount, setAmount] = useState('')
-  const [tipAmount, setTipAmount] = useState('')
+  const [amount, setAmount] = useState(0) // Now in cents
+  const [tipAmount, setTipAmount] = useState(0) // Now in cents
   const [serviceDate, setServiceDate] = useState(new Date().toISOString().split('T')[0])
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
@@ -38,6 +32,7 @@ export default function NewService() {
   const { clients, loading: clientsLoading, createClient } = useClients()
   const { createService } = useServices()
   const { currentPeriod } = usePaymentPeriods()
+  const { t } = useLanguage()
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -47,7 +42,7 @@ export default function NewService() {
 
     try {
       if (!currentPeriod) {
-        throw new Error('No hay un período activo.')
+        throw new Error(t('services.noActivePeriod'))
       }
 
       let clientId = selectedClient?.id
@@ -63,7 +58,7 @@ export default function NewService() {
       }
 
       if (!clientId) {
-        throw new Error('Debes seleccionar o crear un cliente')
+        throw new Error(t('services.mustSelectOrCreateClient'))
       }
 
       await createService({
@@ -71,15 +66,15 @@ export default function NewService() {
         payment_period_id: currentPeriod.id,
         service_description: serviceDescription,
         service_date: serviceDate,
-        amount: parseFloat(amount),
-        tip_amount: tipAmount ? parseFloat(tipAmount) : 0,
+        amount: amount, // Already in cents
+        tip_amount: tipAmount, // Already in cents
         commission_rate: 0, // Se calculará automáticamente
         is_paid: false
       })
       
       navigate('/services')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al crear servicio')
+      setError(err instanceof Error ? err.message : t('services.errorCreating'))
     } finally {
       setLoading(false)
     }
@@ -89,23 +84,15 @@ export default function NewService() {
     return (
       <Layout requireAuth={true} requireServiceProvider={true}>
         <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="space-y-6">
-            {/* Header skeleton */}
-            <div className="space-y-2">
-              <div className="h-8 rounded w-1/3 animate-pulse" style={{ backgroundColor: 'hsl(var(--muted))' }}></div>
-              <div className="h-4 rounded w-1/2 animate-pulse" style={{ backgroundColor: 'hsl(var(--muted))' }}></div>
-            </div>
-            
-            {/* Form skeleton */}
-            <div className="p-6 rounded-lg border" style={{ backgroundColor: 'hsl(var(--card))', borderColor: 'hsl(var(--border))' }}>
-              <div className="h-6 rounded w-1/4 mb-4 animate-pulse" style={{ backgroundColor: 'hsl(var(--muted))' }}></div>
-              <div className="space-y-4">
-                <div className="h-10 rounded animate-pulse" style={{ backgroundColor: 'hsl(var(--muted))' }}></div>
-                <div className="h-10 rounded animate-pulse" style={{ backgroundColor: 'hsl(var(--muted))' }}></div>
-                <div className="h-10 rounded animate-pulse" style={{ backgroundColor: 'hsl(var(--muted))' }}></div>
-                <div className="h-10 rounded animate-pulse" style={{ backgroundColor: 'hsl(var(--muted))' }}></div>
-                <div className="h-10 rounded animate-pulse" style={{ backgroundColor: 'hsl(var(--muted))' }}></div>
-              </div>
+          <div className="animate-pulse space-y-6">
+            <div className="h-8 bg-gray-200 rounded w-1/3"></div>
+            <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+            <div className="space-y-4">
+              <div className="h-10 bg-gray-200 rounded"></div>
+              <div className="h-10 bg-gray-200 rounded"></div>
+              <div className="h-10 bg-gray-200 rounded"></div>
+              <div className="h-10 bg-gray-200 rounded"></div>
+              <div className="h-10 bg-gray-200 rounded"></div>
             </div>
           </div>
         </div>
@@ -118,95 +105,81 @@ export default function NewService() {
       <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Header */}
         <div className="mb-8">
-          <Button
-            variant="ghost"
-            onClick={() => navigate('/services')}
-            className="mb-4"
-          >
-            <ArrowLeft className="mr-2 h-4 w-4" />
-            Volver a Servicios
-          </Button>
-          <h1 className="text-3xl font-bold text-gray-900">
-            Nuevo Servicio
+          <h1 className="text-2xl sm:text-3xl font-bold text-dark-blue-900">
+            {t('services.newService')}
           </h1>
-          <p className="mt-2 text-gray-600">
-            Registra un nuevo servicio prestado
+          <p className="mt-1 sm:mt-2 text-dark-blue-600 text-sm sm:text-base">
+            {t('services.registerNewService')}
           </p>
         </div>
 
-        <Card>
-          <CardHeader>
-            <CardTitle>Información del Servicio</CardTitle>
-            <CardDescription>
-              Completa los detalles del servicio prestado
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <form onSubmit={handleSubmit} className="space-y-4">
-              {error && (
-                <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-                  {error}
-                </div>
-              )}
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {error && (
+            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+              {error}
+            </div>
+          )}
 
-              <Autocomplete
-                label="Cliente"
-                placeholder="Buscar o crear cliente..."
-                options={clients.map(client => ({ id: client.id, name: client.name }))}
-                value={clientName}
-                onChange={setClientName}
-                onSelect={setSelectedClient}
-                required
-              />
-              
-              <Input
-                label="Descripción del Servicio"
-                value={serviceDescription}
-                onChange={(e) => setServiceDescription(e.target.value)}
-                required
-                placeholder="Ej: Corte de cabello, Barba y bigote"
-              />
-              
-              <Input
-                label="Monto Cobrado"
-                type="number"
+          <div className="space-y-4">
+            <Autocomplete
+              label={t('services.client')}
+              placeholder={t('services.searchClient')}
+              options={clients.map(client => ({ id: client.id, name: client.name }))}
+              value={clientName}
+              onChange={setClientName}
+              onSelect={setSelectedClient}
+              required
+            />
+            
+            <Input
+              label={t('services.serviceDescription')}
+              value={serviceDescription}
+              onChange={(e) => setServiceDescription(e.target.value)}
+              required
+              placeholder={t('services.serviceDescriptionPlaceholder')}
+            />
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('services.amount')}
+              </label>
+              <MoneyInput
                 value={amount}
-                onChange={(e) => setAmount(e.target.value)}
+                onChange={setAmount}
                 required
-                min="0"
-                step="0.01"
-                placeholder="25.00"
+                placeholder={t('services.amountPlaceholder')}
               />
-              
-              <Input
-                label="Propina (Opcional)"
-                type="number"
+            </div>
+            
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                {t('services.tipAmount')}
+              </label>
+              <MoneyInput
                 value={tipAmount}
-                onChange={(e) => setTipAmount(e.target.value)}
-                min="0"
-                step="0.01"
-                placeholder="5.00"
+                onChange={setTipAmount}
+                placeholder={t('services.tipPlaceholder')}
               />
-              
-              <Input
-                label="Fecha del Servicio"
-                type="date"
-                value={serviceDate}
-                onChange={(e) => setServiceDate(e.target.value)}
-                required
-              />
-              
-              <Button
-                type="submit"
-                className="w-full"
-                loading={loading}
-                disabled={loading || !currentPeriod}
-              >
-                Registrar Servicio
-              </Button>
-            </form>
-          </CardContent>
-        </Card>
+            </div>
+            
+            <Input
+              label={t('services.serviceDate')}
+              type="date"
+              value={serviceDate}
+              onChange={(e) => setServiceDate(e.target.value)}
+              required
+            />
+          </div>
+          
+          <Button
+            type="submit"
+            className="w-full"
+            loading={loading}
+            disabled={loading || !currentPeriod}
+          >
+            {t('services.registerService')}
+          </Button>
+        </form>
       </div>
     </Layout>
   )

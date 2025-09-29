@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react'
 import { supabase } from '~/supabase/client'
+import { useCurrency } from './useCurrency'
 import type { Tables, TablesInsert, TablesUpdate } from '~/supabase/types'
 
 type Service = Tables<'services'>
@@ -10,6 +11,7 @@ export function useServices(paymentPeriodId?: string) {
   const [services, setServices] = useState<Service[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
+  const { fromCents } = useCurrency()
 
   useEffect(() => {
     fetchServices()
@@ -78,14 +80,18 @@ export function useServices(paymentPeriodId?: string) {
 
       if (!serviceProvider) throw new Error('Perfil de proveedor no encontrado')
 
+      // Calculate commission and net amount (data.amount is already in cents)
+      const commissionAmount = Math.round(data.amount * (serviceProvider.commission_rate / 100))
+      const netAmount = data.amount - commissionAmount
+
       const { data: result, error } = await supabase
         .from('services')
         .insert({ 
           ...data, 
           provider_id: serviceProvider.id,
           commission_rate: serviceProvider.commission_rate,
-          commission_amount: 0, // Will be calculated by trigger
-          net_amount: 0, // Will be calculated by trigger
+          commission_amount: commissionAmount,
+          net_amount: netAmount,
           tip_amount: data.tip_amount || 0
         })
         .select(`

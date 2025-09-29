@@ -53,9 +53,9 @@ export type Database = {
           provider_id: string
           period_start: string
           period_end: string | null
-          total_amount: number
-          total_commission: number
-          total_net_amount: number
+          total_amount: number  // stored in cents
+          total_commission: number  // stored in cents
+          total_net_amount: number  // stored in cents
           is_closed: boolean
           created_at: string
           updated_at: string
@@ -99,7 +99,9 @@ export type Database = {
           id: string
           user_id: string
           business_name: string | null
-          commission_rate: number
+          commission_rate: number  // stored as percentage (e.g., 15.5)
+          language_code: string
+          currency_code: string
           created_at: string
           updated_at: string
         }
@@ -108,6 +110,8 @@ export type Database = {
           user_id: string
           business_name?: string | null
           commission_rate?: number
+          language_code?: string
+          currency_code?: string
           created_at?: string
           updated_at?: string
         }
@@ -116,6 +120,8 @@ export type Database = {
           user_id?: string
           business_name?: string | null
           commission_rate?: number
+          language_code?: string
+          currency_code?: string
           created_at?: string
           updated_at?: string
         }
@@ -125,6 +131,69 @@ export type Database = {
             columns: ["user_id"]
             isOneToOne: true
             referencedRelation: "users"
+            referencedColumns: ["id"]
+          }
+        ]
+      }
+      services: {
+        Row: {
+          id: string
+          client_id: string
+          payment_period_id: string
+          service_description: string
+          service_date: string | null
+          amount: number  // stored in cents
+          commission_rate: number
+          commission_amount: number  // stored in cents
+          net_amount: number  // stored in cents
+          tip_amount: number | null  // stored in cents
+          is_paid: boolean
+          created_at: string
+          updated_at: string
+        }
+        Insert: {
+          id?: string
+          client_id: string
+          payment_period_id: string
+          service_description: string
+          service_date?: string | null
+          amount: number
+          commission_rate?: number
+          commission_amount?: number
+          net_amount?: number
+          tip_amount?: number | null
+          is_paid?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Update: {
+          id?: string
+          client_id?: string
+          payment_period_id?: string
+          service_description?: string
+          service_date?: string | null
+          amount?: number
+          commission_rate?: number
+          commission_amount?: number
+          net_amount?: number
+          tip_amount?: number | null
+          is_paid?: boolean
+          created_at?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "services_client_id_fkey"
+            columns: ["client_id"]
+            isOneToOne: false
+            referencedRelation: "clients"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "services_payment_period_id_fkey"
+            columns: ["payment_period_id"]
+            isOneToOne: false
+            referencedRelation: "payment_periods"
             referencedColumns: ["id"]
           }
         ]

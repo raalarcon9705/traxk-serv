@@ -1,9 +1,11 @@
 import { usePaymentPeriods } from '~/lib/hooks/usePaymentPeriods'
+import { useLanguage } from '~/lib/hooks/useLanguage'
+import { useCurrency } from '~/lib/hooks/useCurrency'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/Card'
 import { Button } from '~/components/ui/Button'
 import { Link } from 'react-router'
 import { Plus, Calendar, DollarSign, CheckCircle, Clock } from 'lucide-react'
-import type { Route } from "./+types/periods";
+import type { Route } from '../+types/root'
 
 export function meta({}: Route.MetaArgs) {
   return [
@@ -21,6 +23,8 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Periods() {
   const { paymentPeriods, currentPeriod, loading, error, closePaymentPeriod } = usePaymentPeriods()
+  const { t } = useLanguage()
+  const { formatCurrency } = useCurrency()
 
   const handleClosePeriod = async (periodId: string) => {
     try {
@@ -42,7 +46,7 @@ export default function Periods() {
     return (
       <div className="min-h-screen bg-gray-50 flex items-center justify-center">
         <div className="text-center">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Error</h2>
+          <h2 className="text-2xl font-bold text-gray-900 mb-4">{t('common.error')}</h2>
           <p className="text-gray-600">{error}</p>
         </div>
       </div>
@@ -56,15 +60,15 @@ export default function Periods() {
         <div className="mb-8">
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-3xl font-bold text-gray-900">Períodos de Pago</h1>
+              <h1 className="text-3xl font-bold text-gray-900">{t('periods.title')}</h1>
               <p className="mt-2 text-gray-600">
-                Gestiona tus períodos de pago y comisiones
+                {t('periods.managePeriods')}
               </p>
             </div>
             <Link to="/periods/new">
               <Button>
                 <Plus className="mr-2 h-4 w-4" />
-                Nuevo Período
+                {t('periods.newPeriod')}
               </Button>
             </Link>
           </div>
@@ -76,32 +80,32 @@ export default function Periods() {
             <CardHeader>
               <CardTitle className="flex items-center">
                 <Clock className="mr-2 h-5 w-5 text-green-600" />
-                Período Actual
+                {t('periods.currentPeriod')}
               </CardTitle>
               <CardDescription>
-                Período activo desde {new Date(currentPeriod.period_start).toLocaleDateString()}
+                {t('periods.activeSince')} {new Date(currentPeriod.period_start).toLocaleDateString()}
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
                 <div>
-                  <p className="text-sm text-gray-600">Total</p>
-                  <p className="text-2xl font-bold">${currentPeriod.total_amount.toFixed(2)}</p>
+                  <p className="text-sm text-gray-600">{t('periods.total')}</p>
+                  <p className="text-2xl font-bold">{formatCurrency(currentPeriod.total_amount || 0)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Comisión</p>
-                  <p className="text-2xl font-bold">${currentPeriod.total_commission.toFixed(2)}</p>
+                  <p className="text-sm text-gray-600">{t('periods.commission')}</p>
+                  <p className="text-2xl font-bold">{formatCurrency(currentPeriod?.total_commission || 0)}</p>
                 </div>
                 <div>
-                  <p className="text-sm text-gray-600">Pago Neto</p>
-                  <p className="text-2xl font-bold">${currentPeriod.total_net_amount.toFixed(2)}</p>
+                  <p className="text-sm text-gray-600">{t('periods.netPayment')}</p>
+                  <p className="text-2xl font-bold">{formatCurrency(currentPeriod.total_net_amount || 0)}</p>
                 </div>
               </div>
               <Button
                 onClick={() => handleClosePeriod(currentPeriod.id)}
                 variant="destructive"
               >
-                Cerrar Período
+                {t('periods.closePeriod')}
               </Button>
             </CardContent>
           </Card>
@@ -112,14 +116,14 @@ export default function Periods() {
           <Card>
             <CardContent className="text-center py-12">
               <Calendar className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-4 text-lg font-medium text-gray-900">No hay períodos</h3>
+              <h3 className="mt-4 text-lg font-medium text-gray-900">{t('periods.noPeriods')}</h3>
               <p className="mt-2 text-gray-500">
-                Comienza creando tu primer período de pago
+                {t('periods.createFirstPeriod')}
               </p>
               <Link to="/periods/new">
                 <Button className="mt-4">
                   <Plus className="mr-2 h-4 w-4" />
-                  Crear Período
+                  {t('periods.createPeriod')}
                 </Button>
               </Link>
             </CardContent>
@@ -133,34 +137,34 @@ export default function Periods() {
                     <div className="flex-1">
                       <div className="flex items-center mb-2">
                         <h3 className="text-lg font-semibold">
-                          Período {new Date(period.period_start).toLocaleDateString()}
+                          {t('periods.period')} {new Date(period.period_start).toLocaleDateString()}
                         </h3>
                         {period.is_closed ? (
                           <div className="ml-2 flex items-center text-green-600">
                             <CheckCircle className="mr-1 h-4 w-4" />
-                            <span className="text-sm">Cerrado</span>
+                            <span className="text-sm">{t('periods.closed')}</span>
                           </div>
                         ) : (
                           <div className="ml-2 flex items-center text-orange-600">
                             <Clock className="mr-1 h-4 w-4" />
-                            <span className="text-sm">Activo</span>
+                            <span className="text-sm">{t('periods.active')}</span>
                           </div>
                         )}
                       </div>
                       <p className="text-sm text-gray-600">
                         {period.period_end 
-                          ? `Hasta ${new Date(period.period_end).toLocaleDateString()}`
-                          : 'Período en curso'
+                          ? `${t('periods.until')} ${new Date(period.period_end).toLocaleDateString()}`
+                          : t('periods.periodInProgress')
                         }
                       </p>
                     </div>
                     <div className="text-right">
-                      <div className="text-lg font-semibold">${period.total_amount.toFixed(2)}</div>
+                      <div className="text-lg font-semibold">{formatCurrency(period.total_amount || 0)}</div>
                       <div className="text-sm text-gray-600">
-                        Comisión: ${period.total_commission.toFixed(2)}
+                        {t('periods.commission')}: {formatCurrency(period.total_commission || 0)}
                       </div>
                       <div className="text-sm text-gray-600">
-                        Neto: ${period.total_net_amount.toFixed(2)}
+                        {t('periods.net')}: {formatCurrency(period.total_net_amount || 0)}
                       </div>
                     </div>
                   </div>

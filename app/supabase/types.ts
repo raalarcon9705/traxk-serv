@@ -104,7 +104,9 @@ export type Database = {
           business_name: string | null
           commission_rate: number
           created_at: string | null
+          currency_code: string
           id: string
+          language_code: string
           updated_at: string | null
           user_id: string | null
         }
@@ -112,7 +114,9 @@ export type Database = {
           business_name?: string | null
           commission_rate?: number
           created_at?: string | null
+          currency_code?: string
           id?: string
+          language_code?: string
           updated_at?: string | null
           user_id?: string | null
         }
@@ -120,7 +124,9 @@ export type Database = {
           business_name?: string | null
           commission_rate?: number
           created_at?: string | null
+          currency_code?: string
           id?: string
+          language_code?: string
           updated_at?: string | null
           user_id?: string | null
         }

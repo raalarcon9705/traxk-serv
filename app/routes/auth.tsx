@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useAuth } from '~/lib/auth'
+import { useLanguage } from '~/lib/hooks/useLanguage'
 import { Button } from '~/components/ui/Button'
 import { Input } from '~/components/ui/Input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/Card'
@@ -29,6 +30,7 @@ export default function Auth() {
   const [success, setSuccess] = useState('')
   
   const { signIn, signUp } = useAuth()
+  const { t } = useLanguage()
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -84,12 +86,12 @@ export default function Auth() {
     <div className="min-h-screen flex flex-col justify-center py-16 sm:py-20 px-4 sm:px-6 lg:px-8" style={{ backgroundColor: 'hsl(var(--background))' }}>
       <div className="sm:mx-auto sm:w-full sm:max-w-md">
         <h2 className="mt-6 text-center text-3xl font-extrabold" style={{ color: 'hsl(var(--foreground))' }}>
-          {isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}
+          {isLogin ? t('auth.title') : t('auth.signupTitle')}
         </h2>
         <p className="mt-2 text-center text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
           {isLogin 
-            ? 'Ingresa tus credenciales para acceder'
-            : 'Crea una cuenta para comenzar'
+            ? t('auth.welcomeMessage')
+            : t('auth.createAccountMessage')
           }
         </p>
       </div>
@@ -98,12 +100,12 @@ export default function Auth() {
         <Card>
           <CardHeader className="space-y-1">
             <CardTitle className="text-xl">
-              {isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}
+              {isLogin ? t('auth.title') : t('auth.signupTitle')}
             </CardTitle>
             <CardDescription>
               {isLogin 
-                ? 'Ingresa tus credenciales para acceder'
-                : 'Crea una cuenta para comenzar'
+                ? t('auth.welcomeMessage')
+                : t('auth.createAccountMessage')
               }
             </CardDescription>
           </CardHeader>
@@ -136,21 +138,21 @@ export default function Auth() {
               
               <div className="space-y-4">
                 <Input
-                  label="Correo Electrónico"
+                  label={t('auth.email')}
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   required
-                  placeholder="tu@email.com"
+                  placeholder={t('auth.emailPlaceholder')}
                 />
                 
                 <Input
-                  label="Contraseña"
+                  label={t('auth.password')}
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   required
-                  placeholder="••••••••"
+                  placeholder={t('auth.passwordPlaceholder')}
                 />
               </div>
               
@@ -160,14 +162,14 @@ export default function Auth() {
                 loading={loading}
                 disabled={loading}
               >
-                {isLogin ? 'Iniciar Sesión' : 'Crear Cuenta'}
+                {isLogin ? t('auth.signIn') : t('auth.signUp')}
               </Button>
               
               <div className="mt-6 pt-4 border-t border-gray-200">
                 <p className="text-center text-sm text-gray-600">
                   {isLogin ? (
                     <>
-                      ¿No tienes cuenta?{' '}
+                      {t('auth.noAccount')}{' '}
                       <button
                         type="button"
                         onClick={() => {
@@ -177,12 +179,12 @@ export default function Auth() {
                         }}
                         className="font-medium text-dark-blue-600 hover:text-dark-blue-700 hover:underline"
                       >
-                        Regístrate aquí
+                        {t('auth.signUpHere')}
                       </button>
                     </>
                   ) : (
                     <>
-                      ¿Ya tienes cuenta?{' '}
+                      {t('auth.hasAccount')}{' '}
                       <button
                         type="button"
                         onClick={() => {
@@ -192,7 +194,7 @@ export default function Auth() {
                         }}
                         className="font-medium text-dark-blue-600 hover:text-dark-blue-700 hover:underline"
                       >
-                        Inicia sesión aquí
+                        {t('auth.signInHere')}
                       </button>
                     </>
                   )}

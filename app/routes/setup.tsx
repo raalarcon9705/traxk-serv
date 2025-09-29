@@ -1,10 +1,13 @@
 import React, { useState } from 'react'
 import { useAuth } from '~/lib/auth'
 import { useServiceProvider } from '~/lib/hooks/useServiceProvider'
+import { useLanguage } from '~/lib/hooks/useLanguage'
+import { useCurrency } from '~/lib/hooks/useCurrency'
 import { Button } from '~/components/ui/Button'
 import { Input } from '~/components/ui/Input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/Card'
 import { Layout } from '~/components/Layout'
+import { LanguageCurrencySelector } from '~/components/LanguageCurrencySelector'
 import { useNavigate } from 'react-router'
 import type { Route } from "./+types/setup";
 
@@ -27,9 +30,12 @@ export default function Setup() {
   const [commissionRate, setCommissionRate] = useState('15')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [showLanguageCurrency, setShowLanguageCurrency] = useState(false)
   
   const { user } = useAuth()
   const { serviceProvider, createServiceProvider, updateServiceProvider } = useServiceProvider()
+  const { t } = useLanguage()
+  const { formatCurrency } = useCurrency()
   const navigate = useNavigate()
 
   // Si ya existe un service provider, cargar los datos existentes
@@ -59,7 +65,9 @@ export default function Setup() {
         await createServiceProvider({
           user_id: user.id,
           business_name: businessName,
-          commission_rate: parseFloat(commissionRate)
+          commission_rate: parseFloat(commissionRate),
+          language_code: 'pt',
+          currency_code: 'BRL'
         })
       }
       
@@ -75,80 +83,99 @@ export default function Setup() {
     <Layout requireAuth={true} requireServiceProvider={false}>
       <div className="min-h-screen" style={{ backgroundColor: 'hsl(var(--background))' }}>
         <div className="flex flex-col justify-center py-16 sm:py-20 px-4 sm:px-6 lg:px-8">
-          <div className="sm:mx-auto sm:w-full sm:max-w-md">
+          <div className="sm:mx-auto sm:w-full sm:max-w-4xl">
             <h2 className="mt-6 text-center text-3xl font-extrabold" style={{ color: 'hsl(var(--foreground))' }}>
-              {serviceProvider ? 'Actualizar Perfil' : 'Configurar Perfil'}
+              {serviceProvider ? t('setup.title') : t('setup.title')}
             </h2>
             <p className="mt-2 text-center text-sm" style={{ color: 'hsl(var(--muted-foreground))' }}>
               {serviceProvider 
-                ? 'Actualiza la información de tu perfil de proveedor de servicios'
-                : 'Configura tu perfil de proveedor de servicios'
+                ? 'Atualize as informações do seu perfil de prestador de serviços'
+                : 'Configure seu perfil de prestador de serviços'
               }
             </p>
           </div>
 
-          <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
-          <Card>
-            <CardHeader className="space-y-1">
-              <CardTitle className="text-xl">
-                Información del Negocio
-              </CardTitle>
-              <CardDescription>
-                {serviceProvider 
-                  ? 'Actualiza la información básica de tu negocio'
-                  : 'Completa la información básica de tu negocio'
-                }
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <form onSubmit={handleSubmit} className="space-y-6">
-                {error && (
-                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
-                    {error}
-                  </div>
-                )}
-                
-                <div className="space-y-4">
-                  <Input
-                    label="Nombre del Negocio"
-                    value={businessName}
-                    onChange={(e) => setBusinessName(e.target.value)}
-                    required
-                    placeholder="Ej: Barbería El Estilo"
-                  />
-                  
-                  <Input
-                    label="Tasa de Comisión (%)"
-                    type="number"
-                    value={commissionRate}
-                    onChange={(e) => setCommissionRate(e.target.value)}
-                    required
-                    min="0"
-                    max="100"
-                    step="0.01"
-                    placeholder="15"
-                  />
-                </div>
-                
-                <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded">
-                  <p className="text-sm">
-                    <strong>Ejemplo:</strong> Si cobras $100 y tu comisión es {commissionRate}%, 
-                    recibirás ${(100 * (1 - parseFloat(commissionRate) / 100)).toFixed(2)} 
-                    (${(100 * parseFloat(commissionRate) / 100).toFixed(2)} de comisión)
-                  </p>
-                </div>
-                
-                <Button
-                  type="submit"
-                  className="w-full"
-                  loading={loading}
-                  disabled={loading}
-                >
-                  {serviceProvider ? 'Actualizar Perfil' : 'Crear Perfil'}
-                </Button>
-              </form>
-            </CardContent>
-          </Card>
+          <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-4xl">
+            {showLanguageCurrency ? (
+              <LanguageCurrencySelector 
+                onClose={() => setShowLanguageCurrency(false)}
+                showTitle={false}
+              />
+            ) : (
+              <div className="space-y-6">
+                <Card>
+                  <CardHeader className="space-y-1">
+                    <CardTitle className="text-xl">
+                      {t('setup.title')}
+                    </CardTitle>
+                    <CardDescription>
+                      {serviceProvider 
+                        ? 'Atualize as informações básicas do seu negócio'
+                        : 'Complete as informações básicas do seu negócio'
+                      }
+                    </CardDescription>
+                  </CardHeader>
+                  <CardContent>
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                      {error && (
+                        <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded">
+                          {error}
+                        </div>
+                      )}
+                      
+                      <div className="space-y-4">
+                        <Input
+                          label={t('setup.businessName')}
+                          value={businessName}
+                          onChange={(e) => setBusinessName(e.target.value)}
+                          required
+                          placeholder={t('setup.businessNamePlaceholder')}
+                        />
+                        
+                        <Input
+                          label={t('setup.commissionRate')}
+                          type="number"
+                          value={commissionRate}
+                          onChange={(e) => setCommissionRate(e.target.value)}
+                          required
+                          min="0"
+                          max="100"
+                          step="0.01"
+                          placeholder={t('setup.commissionRatePlaceholder')}
+                        />
+                      </div>
+                      
+                      <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded">
+                        <p className="text-sm">
+                          <strong>Exemplo:</strong> Se você cobra R$100 e sua comissão é {commissionRate}%, 
+                          receberá {formatCurrency(Math.round(10000 * (1 - parseFloat(commissionRate) / 100)))} 
+                          ({formatCurrency(Math.round(10000 * parseFloat(commissionRate) / 100))} de comissão)
+                        </p>
+                      </div>
+                      
+                      <div className="flex gap-4">
+                        <Button
+                          type="button"
+                          variant="outline"
+                          onClick={() => setShowLanguageCurrency(true)}
+                          className="flex-1"
+                        >
+                          {t('setup.language')} / {t('setup.currency')}
+                        </Button>
+                        <Button
+                          type="submit"
+                          className="flex-1"
+                          loading={loading}
+                          disabled={loading}
+                        >
+                          {serviceProvider ? t('common.update') : t('common.create')} {t('setup.title')}
+                        </Button>
+                      </div>
+                    </form>
+                  </CardContent>
+                </Card>
+              </div>
+            )}
           </div>
         </div>
       </div>

@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useServices } from '~/lib/hooks/useServices'
+import { useLanguage } from '~/lib/hooks/useLanguage'
+import { useCurrency } from '~/lib/hooks/useCurrency'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/Card'
 import { Button } from '~/components/ui/Button'
 import { Layout } from '~/components/Layout'
@@ -26,6 +28,8 @@ export default function Report() {
   const itemsPerPage = 10
   
   const { services: allServices, loading, error } = useServices() // Get all services
+  const { t } = useLanguage()
+  const { formatCurrency } = useCurrency()
   const navigate = useNavigate()
 
   // Calculate pagination
@@ -42,15 +46,15 @@ export default function Report() {
   const pendingServices = allServices.length - paidServices
 
   const exportToCSV = () => {
-    const headers = ['Fecha', 'Cliente', 'Servicio', 'Monto', 'Comisión', 'Neto', 'Estado']
+    const headers = [t('report.date'), t('report.client'), t('report.service'), t('report.amount'), t('report.commission'), t('report.net'), t('report.status')]
     const csvData = allServices.map(service => [
-      service.service_date ? new Date(service.service_date).toLocaleDateString() : 'Sin fecha',
+      service.service_date ? new Date(service.service_date).toLocaleDateString() : t('report.noDate'),
       (service as any).clients?.name || 'N/A',
       service.service_description,
       service.amount.toFixed(2),
       service.commission_amount.toFixed(2),
       service.net_amount.toFixed(2),
-      service.is_paid ? 'Pagado' : 'Pendiente'
+      service.is_paid ? t('report.paid') : t('report.pending')
     ])
 
     const csvContent = [headers, ...csvData]
@@ -120,16 +124,16 @@ export default function Report() {
           <div className="mb-6 sm:mb-8">
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
               <div>
-                <h1 className="text-2xl sm:text-3xl font-bold text-dark-blue-900">Historial de Servicios</h1>
+                <h1 className="text-2xl sm:text-3xl font-bold text-dark-blue-900">{t('report.title')}</h1>
                 <p className="mt-1 sm:mt-2 text-dark-blue-600 text-sm sm:text-base">
-                  Todos los servicios prestados ({allServices.length} servicios)
+                  {t('report.allServicesProvided')} ({allServices.length} {t('report.services')})
                 </p>
               </div>
               <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
                 <Button onClick={exportToCSV} variant="outline" className="w-full sm:w-auto text-dark-blue-600 hover:text-dark-blue-900 hover:bg-dark-blue-100">
                   <Download className="mr-2 h-4 w-4" />
-                  <span className="hidden sm:inline">Exportar CSV</span>
-                  <span className="sm:hidden">Exportar</span>
+                  <span className="hidden sm:inline">{t('report.exportCSV')}</span>
+                  <span className="sm:hidden">{t('report.export')}</span>
                 </Button>
               </div>
             </div>
@@ -139,46 +143,46 @@ export default function Report() {
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 mb-6 sm:mb-8">
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Total General</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('report.totalGeneral')}</CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${totalAmount.toFixed(2)}</div>
+                <div className="text-2xl font-bold">{formatCurrency(totalAmount)}</div>
                 <p className="text-xs text-muted-foreground">
-                  {allServices.length} servicios
+                  {allServices.length} {t('report.services')}
                 </p>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Comisión</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('report.commission')}</CardTitle>
                 <TrendingUp className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${totalCommission.toFixed(2)}</div>
+                <div className="text-2xl font-bold">{formatCurrency(totalCommission)}</div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Pago Neto</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('report.netPayment')}</CardTitle>
                 <DollarSign className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
-                <div className="text-2xl font-bold">${totalNet.toFixed(2)}</div>
+                <div className="text-2xl font-bold">{formatCurrency(totalNet)}</div>
               </CardContent>
             </Card>
 
             <Card>
               <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-                <CardTitle className="text-sm font-medium">Estado</CardTitle>
+                <CardTitle className="text-sm font-medium">{t('report.status')}</CardTitle>
                 <Calendar className="h-4 w-4 text-muted-foreground" />
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{paidServices}</div>
                 <p className="text-xs text-muted-foreground">
-                  de {allServices.length} pagados
+                  {t('report.of')} {allServices.length} {t('report.paid')}
                 </p>
               </CardContent>
             </Card>
@@ -189,18 +193,18 @@ export default function Report() {
             <Card>
               <CardContent className="text-center py-12">
                 <Calendar className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-4 text-lg font-medium text-gray-900">No hay servicios</h3>
+                <h3 className="mt-4 text-lg font-medium text-gray-900">{t('report.noServices')}</h3>
                 <p className="mt-2 text-gray-500">
-                  No se encontraron servicios registrados
+                  {t('report.noServicesFound')}
                 </p>
               </CardContent>
             </Card>
           ) : (
             <Card>
               <CardHeader>
-                <CardTitle>Historial de Servicios</CardTitle>
+                <CardTitle>{t('report.serviceHistory')}</CardTitle>
                 <CardDescription>
-                  Lista detallada de todos los servicios prestados
+                  {t('report.detailedList')}
                 </CardDescription>
               </CardHeader>
               <CardContent>
@@ -210,19 +214,19 @@ export default function Report() {
                       <div className="flex-1">
                         <h3 className="text-lg font-semibold">{service.service_description}</h3>
                         <p className="text-sm text-gray-600">
-                          Cliente: {(service as any).clients?.name}
+                          {t('report.client')}: {(service as any).clients?.name}
                         </p>
                         <p className="text-sm text-gray-500">
-                          {service.service_date ? new Date(service.service_date).toLocaleDateString() : 'Sin fecha'}
+                          {service.service_date ? new Date(service.service_date).toLocaleDateString() : t('report.noDate')}
                         </p>
                       </div>
                       <div className="text-right">
-                        <div className="text-lg font-semibold">${service.amount.toFixed(2)}</div>
+                        <div className="text-lg font-semibold">{formatCurrency(service.amount)}</div>
                         <div className="text-sm text-gray-600">
-                          Comisión: ${service.commission_amount.toFixed(2)}
+                          {t('report.commission')}: {formatCurrency(service.commission_amount)}
                         </div>
                         <div className="text-sm text-gray-600">
-                          Neto: ${service.net_amount.toFixed(2)}
+                          {t('report.net')}: {formatCurrency(service.net_amount)}
                         </div>
                       </div>
                       <div className="ml-4">
@@ -231,7 +235,7 @@ export default function Report() {
                             ? 'bg-green-100 text-green-800' 
                             : 'bg-orange-100 text-orange-800'
                         }`}>
-                          {service.is_paid ? 'Pagado' : 'Pendiente'}
+                          {service.is_paid ? t('report.paid') : t('report.pending')}
                         </span>
                       </div>
                     </div>
@@ -242,7 +246,7 @@ export default function Report() {
                 {totalPages > 1 && (
                   <div className="flex items-center justify-between mt-6 pt-4 border-t">
                     <div className="text-sm text-gray-500">
-                      Mostrando {startIndex + 1} a {Math.min(endIndex, allServices.length)} de {allServices.length} servicios
+                      {t('report.showing')} {startIndex + 1} {t('report.to')} {Math.min(endIndex, allServices.length)} {t('report.of')} {allServices.length} {t('report.services')}
                     </div>
                     <div className="flex items-center space-x-2">
                       <Button
@@ -252,7 +256,7 @@ export default function Report() {
                         disabled={currentPage === 1}
                       >
                         <ChevronLeft className="h-4 w-4" />
-                        Anterior
+                        {t('common.previous')}
                       </Button>
                       
                       <div className="flex items-center space-x-1">
@@ -275,7 +279,7 @@ export default function Report() {
                         onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                         disabled={currentPage === totalPages}
                       >
-                        Siguiente
+                        {t('common.next')}
                         <ChevronRight className="h-4 w-4" />
                       </Button>
                     </div>

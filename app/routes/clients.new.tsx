@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { useClients } from '~/lib/hooks/useClients'
+import { useLanguage } from '~/lib/hooks/useLanguage'
 import { Button } from '~/components/ui/Button'
 import { Input } from '~/components/ui/Input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/Card'
@@ -29,6 +30,7 @@ export default function NewClient() {
   const [error, setError] = useState('')
   
   const { createClient } = useClients()
+  const { t } = useLanguage()
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -45,7 +47,7 @@ export default function NewClient() {
       
       navigate('/clients')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al crear cliente')
+      setError(err instanceof Error ? err.message : t('clients.errorCreating'))
     } finally {
       setLoading(false)
     }
@@ -62,21 +64,21 @@ export default function NewClient() {
             className="mb-4"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Volver a Clientes
+            {t('common.back')} {t('clients.title')}
           </Button>
           <h1 className="text-3xl font-bold text-gray-900">
-            Nuevo Cliente
+            {t('clients.newClient')}
           </h1>
           <p className="mt-2 text-gray-600">
-            Agrega un nuevo cliente a tu lista
+            {t('clients.addNewClient')}
           </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Información del Cliente</CardTitle>
+            <CardTitle>{t('clients.clientInfo')}</CardTitle>
             <CardDescription>
-              Completa los datos del cliente
+              {t('clients.completeClientData')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -88,26 +90,26 @@ export default function NewClient() {
               )}
               
               <Input
-                label="Nombre del Cliente *"
+                label={t('clients.clientName')} *
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 required
-                placeholder="Ej: Juan Pérez"
+                placeholder={t('clients.clientNamePlaceholder')}
               />
               
               <Input
-                label="Teléfono"
+                label={t('clients.phone')}
                 value={phone}
                 onChange={(e) => setPhone(e.target.value)}
-                placeholder="+1234567890"
+                placeholder={t('clients.phonePlaceholder')}
               />
               
               <Input
-                label="Email"
+                label={t('clients.email')}
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="cliente@email.com"
+                placeholder={t('clients.emailPlaceholder')}
               />
               
               <div className="flex gap-4">
@@ -117,7 +119,7 @@ export default function NewClient() {
                   onClick={() => navigate('/clients')}
                   className="flex-1"
                 >
-                  Cancelar
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   type="submit"
@@ -125,7 +127,7 @@ export default function NewClient() {
                   loading={loading}
                   disabled={loading}
                 >
-                  Crear Cliente
+                  {t('clients.createClient')}
                 </Button>
               </div>
             </form>

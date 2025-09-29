@@ -1,6 +1,7 @@
 import { useEffect } from 'react'
 import { useAuth } from '~/lib/auth'
 import { useServiceProvider } from '~/lib/hooks/useServiceProvider'
+import { useLanguage } from '~/lib/hooks/useLanguage'
 import { useNavigate } from 'react-router'
 import type { Route } from "./+types/home";
 
@@ -14,6 +15,7 @@ export function meta({}: Route.MetaArgs) {
 export default function Home() {
   const { user, loading: authLoading } = useAuth()
   const { serviceProvider, loading: providerLoading } = useServiceProvider()
+  const { t } = useLanguage()
   const navigate = useNavigate()
 
   useEffect(() => {

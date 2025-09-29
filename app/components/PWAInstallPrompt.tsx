@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { Button } from './ui/Button';
 import { useTheme } from '~/lib/hooks/useTheme';
+import { useLanguage } from '~/lib/hooks/useLanguage';
 
 interface BeforeInstallPromptEvent extends Event {
   prompt(): Promise<void>;
@@ -11,6 +12,7 @@ export function PWAInstallPrompt() {
   const [deferredPrompt, setDeferredPrompt] = useState<BeforeInstallPromptEvent | null>(null);
   const [showInstallPrompt, setShowInstallPrompt] = useState(false);
   const { isDark } = useTheme();
+  const { t } = useLanguage();
 
   useEffect(() => {
     const handleBeforeInstallPrompt = (e: Event) => {
@@ -50,34 +52,25 @@ export function PWAInstallPrompt() {
     }`}>
       <div className="flex items-center justify-between">
         <div>
-          <h3 className="font-semibold">Instalar TrackServ</h3>
+          <h3 className="font-semibold">{t('pwa.installTitle')}</h3>
           <p className={`text-sm ${isDark ? 'text-slate-300' : 'opacity-90'}`}>
-            Agrega TrackServ a tu pantalla de inicio para un acceso más rápido
+            {t('pwa.installMessage')}
           </p>
         </div>
         <div className="flex gap-2 ml-4">
           <Button
             onClick={handleInstallClick}
-            className={
-              isDark 
-                ? 'bg-blue-600 text-white hover:bg-blue-700 border-blue-600' 
-                : 'bg-white text-blue-600 hover:bg-gray-100'
-            }
+            variant="secondary"
             size="sm"
           >
-            Instalar
+            {t('pwa.install')}
           </Button>
           <Button
             onClick={() => setShowInstallPrompt(false)}
-            variant="outline"
-            className={
-              isDark 
-                ? 'border-slate-600 text-slate-300 hover:bg-slate-700 hover:text-slate-100' 
-                : 'border-white text-white hover:bg-white hover:text-blue-600'
-            }
+            variant="ghost"
             size="sm"
           >
-            Cancelar
+            {t('pwa.cancel')}
           </Button>
         </div>
       </div>

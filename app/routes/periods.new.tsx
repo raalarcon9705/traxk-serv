@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { usePaymentPeriods } from '~/lib/hooks/usePaymentPeriods'
+import { useLanguage } from '~/lib/hooks/useLanguage'
 import { Button } from '~/components/ui/Button'
 import { Input } from '~/components/ui/Input'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/Card'
@@ -27,6 +28,7 @@ export default function NewPeriod() {
   const [error, setError] = useState('')
   
   const { createPaymentPeriod } = usePaymentPeriods()
+  const { t } = useLanguage()
   const navigate = useNavigate()
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -43,7 +45,7 @@ export default function NewPeriod() {
       
       navigate('/periods')
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al crear período')
+      setError(err instanceof Error ? err.message : t('periods.errorCreating'))
     } finally {
       setLoading(false)
     }
@@ -60,21 +62,21 @@ export default function NewPeriod() {
             className="mb-4"
           >
             <ArrowLeft className="mr-2 h-4 w-4" />
-            Volver a Períodos
+            {t('common.back')} {t('periods.title')}
           </Button>
           <h1 className="text-3xl font-bold text-gray-900">
-            Nuevo Período
+            {t('periods.newPeriod')}
           </h1>
           <p className="mt-2 text-gray-600">
-            Crea un nuevo período de pago
+            {t('periods.createNewPeriod')}
           </p>
         </div>
 
         <Card>
           <CardHeader>
-            <CardTitle>Información del Período</CardTitle>
+            <CardTitle>{t('periods.periodInfo')}</CardTitle>
             <CardDescription>
-              Configura las fechas del nuevo período
+              {t('periods.configurePeriodDates')}
             </CardDescription>
           </CardHeader>
           <CardContent>
@@ -86,7 +88,7 @@ export default function NewPeriod() {
               )}
               
               <Input
-                label="Fecha de Inicio *"
+                label={t('periods.periodStart')} *
                 type="date"
                 value={periodStart}
                 onChange={(e) => setPeriodStart(e.target.value)}
@@ -95,8 +97,7 @@ export default function NewPeriod() {
               
               <div className="bg-blue-50 border border-blue-200 text-blue-700 px-4 py-3 rounded">
                 <p className="text-sm">
-                  <strong>Nota:</strong> El período se creará como activo. 
-                  Podrás cerrarlo cuando hayas terminado de agregar servicios.
+                  <strong>{t('periods.note')}:</strong> {t('periods.periodNote')}
                 </p>
               </div>
               
@@ -107,7 +108,7 @@ export default function NewPeriod() {
                   onClick={() => navigate('/periods')}
                   className="flex-1"
                 >
-                  Cancelar
+                  {t('common.cancel')}
                 </Button>
                 <Button
                   type="submit"
@@ -115,7 +116,7 @@ export default function NewPeriod() {
                   loading={loading}
                   disabled={loading}
                 >
-                  Crear Período
+                  {t('periods.createPeriod')}
                 </Button>
               </div>
             </form>

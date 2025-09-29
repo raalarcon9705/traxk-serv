@@ -1,5 +1,6 @@
 import { useAuth } from '~/lib/auth'
 import { useTheme } from '~/lib/hooks/useTheme'
+import { useLanguage } from '~/lib/hooks/useLanguage'
 import { Button } from '~/components/ui/Button'
 import { LogOut, User, Menu, Sun, Moon } from 'lucide-react'
 import { Link } from 'react-router'
@@ -11,6 +12,7 @@ interface HeaderProps {
 export function Header({ onMenuToggle }: HeaderProps) {
   const { user, signOut } = useAuth()
   const { theme, toggleTheme, isDark, isHydrated } = useTheme()
+  const { t } = useLanguage()
 
   const handleSignOut = async () => {
     try {
@@ -31,7 +33,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
             className="lg:hidden"
           >
             <Menu className="h-5 w-5" />
-            <span className="sr-only">Abrir menú</span>
+            <span className="sr-only">{t('common.menu')}</span>
           </Button>
           <h1 className="text-lg sm:text-xl font-semibold text-foreground">
             <Link to="/">TrackServ</Link>
@@ -51,7 +53,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
             variant="ghost"
             size="icon"
             onClick={toggleTheme}
-            title={isHydrated && isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+            title={isHydrated && isDark ? t('common.lightMode') : t('common.darkMode')}
           >
             {isHydrated && isDark ? (
               <Sun className="h-4 w-4" />
@@ -59,7 +61,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
               <Moon className="h-4 w-4" />
             )}
             <span className="sr-only">
-              {isHydrated && isDark ? 'Cambiar a modo claro' : 'Cambiar a modo oscuro'}
+              {isHydrated && isDark ? t('common.lightMode') : t('common.darkMode')}
             </span>
           </Button>
           
@@ -69,7 +71,7 @@ export function Header({ onMenuToggle }: HeaderProps) {
             onClick={handleSignOut}
           >
             <LogOut className="h-4 w-4" />
-            <span className="sr-only">Cerrar sesión</span>
+            <span className="sr-only">{t('auth.signOut')}</span>
           </Button>
         </div>
       </div>

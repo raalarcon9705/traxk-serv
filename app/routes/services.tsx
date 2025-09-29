@@ -1,5 +1,7 @@
 import { useState } from 'react'
 import { useServices } from '~/lib/hooks/useServices'
+import { useLanguage } from '~/lib/hooks/useLanguage'
+import { useCurrency } from '~/lib/hooks/useCurrency'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/Card'
 import { Button } from '~/components/ui/Button'
 import { Input } from '~/components/ui/Input'
@@ -25,6 +27,8 @@ export function meta({}: Route.MetaArgs) {
 
 export default function Services() {
   const { services, loading, error, markAsPaid, markAllAsPaid, deleteService, updateService } = useServices()
+  const { t } = useLanguage()
+  const { formatCurrency } = useCurrency()
   const [submitError, setSubmitError] = useState('')
   const [expandedServices, setExpandedServices] = useState<Set<string>>(new Set())
   const [editingService, setEditingService] = useState<string | null>(null)
@@ -206,9 +210,9 @@ export default function Services() {
         <div className="mb-6 sm:mb-8">
           <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
             <div>
-              <h1 className="text-2xl sm:text-3xl font-bold text-dark-blue-900">Servicios</h1>
+              <h1 className="text-2xl sm:text-3xl font-bold text-dark-blue-900">{t('services.title')}</h1>
               <p className="mt-1 sm:mt-2 text-dark-blue-600 text-sm sm:text-base">
-                Gestiona todos tus servicios y comisiones
+                {t('services.manageServices')}
               </p>
             </div>
             <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
@@ -219,15 +223,15 @@ export default function Services() {
                   className="w-full sm:w-auto"
                 >
                   <CheckCircle className="mr-2 h-4 w-4" />
-                  <span className="hidden sm:inline">Marcar Todos como Pagados</span>
-                  <span className="sm:hidden">Marcar Todos</span>
+                  <span className="hidden sm:inline">{t('services.markAllAsPaid')}</span>
+                  <span className="sm:hidden">{t('services.markAllAsPaid')}</span>
                 </Button>
               )}
               <Link to="/services/new" className="w-full sm:w-auto">
                 <Button className="w-full sm:w-auto">
                   <Plus className="mr-2 h-4 w-4" />
-                  <span className="hidden sm:inline">Agregar Servicio</span>
-                  <span className="sm:hidden">Agregar</span>
+                  <span className="hidden sm:inline">{t('services.addService')}</span>
+                  <span className="sm:hidden">{t('services.addService')}</span>
                 </Button>
               </Link>
             </div>
@@ -245,59 +249,59 @@ export default function Services() {
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3 sm:gap-4 lg:gap-6 mb-6 sm:mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Total</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('services.total')}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${totalAmount.toFixed(2)}</div>
+              <div className="text-2xl font-bold">{formatCurrency(totalAmount)}</div>
               <p className="text-xs text-muted-foreground">
-                {services.length} servicios
+                {services.length} {t('services.services')}
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Comisión</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('services.commission')}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${totalCommission.toFixed(2)}</div>
+              <div className="text-2xl font-bold">{formatCurrency(totalCommission)}</div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Pago Neto</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('services.netPayment')}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold">${totalNet.toFixed(2)}</div>
+              <div className="text-2xl font-bold">{formatCurrency(totalNet)}</div>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Propinas</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('services.tips')}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
-              <div className="text-2xl font-bold text-green-600">${totalTips.toFixed(2)}</div>
+              <div className="text-2xl font-bold text-green-600">{formatCurrency(totalTips)}</div>
               <p className="text-xs text-muted-foreground">
-                Total en propinas
+                {t('services.totalInTips')}
               </p>
             </CardContent>
           </Card>
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Estado</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('services.status')}</CardTitle>
               <Clock className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="text-2xl font-bold">{pendingServices}</div>
               <p className="text-xs text-muted-foreground">
-                Pendientes
+                {t('services.pending')}
               </p>
             </CardContent>
           </Card>
@@ -308,14 +312,14 @@ export default function Services() {
           <Card>
             <CardContent className="text-center py-12">
               <Calendar className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-4 text-lg font-medium text-gray-900">No hay servicios</h3>
+              <h3 className="mt-4 text-lg font-medium text-gray-900">{t('services.noServices')}</h3>
               <p className="mt-2 text-gray-500">
-                Comienza agregando tu primer servicio
+                {t('services.startAddingFirstService')}
               </p>
               <Link to="/services/new">
                 <Button className="mt-4">
                   <Plus className="mr-2 h-4 w-4" />
-                  Agregar Servicio
+                  {t('services.addService')}
                 </Button>
               </Link>
             </CardContent>
@@ -419,9 +423,9 @@ export default function Services() {
                         
                         <div className="flex items-center space-x-2 ml-3">
                           <div className="text-right">
-                            <div className="text-lg font-semibold">${service.amount.toFixed(2)}</div>
+                            <div className="text-lg font-semibold">{formatCurrency(service.amount)}</div>
                             <div className="text-sm font-semibold text-blue-600">
-                              Total: ${totalAmount.toFixed(2)}
+                              {t('services.total')}: {formatCurrency(totalAmount)}
                             </div>
                           </div>
                           
@@ -444,7 +448,7 @@ export default function Services() {
                           {service.is_paid ? (
                             <div className="flex items-center text-green-600">
                               <CheckCircle className="mr-1 h-4 w-4" />
-                              <span className="text-sm">Pagado</span>
+                              <span className="text-sm">{t('services.paid')}</span>
                             </div>
                           ) : (
                             <Button
@@ -452,7 +456,7 @@ export default function Services() {
                               onClick={() => handleMarkAsPaid(service.id)}
                               className="whitespace-nowrap"
                             >
-                              Marcar como Pagado
+                              {t('services.markAsPaid')}
                             </Button>
                           )}
                         </div>
@@ -494,20 +498,20 @@ export default function Services() {
                       
                       {/* Financial details - Desktop */}
                       <div className="text-right mr-6">
-                        <div className="text-lg font-semibold">${service.amount.toFixed(2)}</div>
+                        <div className="text-lg font-semibold">{formatCurrency(service.amount)}</div>
                         <div className="text-sm text-red-600">
-                          -${service.commission_amount.toFixed(2)} comisión
+                          -{formatCurrency(service.commission_amount)} {t('services.commission')}
                         </div>
                         <div className="text-sm text-gray-600">
-                          Neto: ${(service.amount - service.commission_amount).toFixed(2)}
+                          {t('services.net')}: {formatCurrency(service.amount - service.commission_amount)}
                         </div>
-                        {service.tip_amount && service.tip_amount > 0 && (
+                        {!!service.tip_amount && service.tip_amount > 0 && (
                           <div className="text-sm text-green-600">
-                            +${service.tip_amount.toFixed(2)} propina
+                            +{formatCurrency(service.tip_amount)} {t('services.tip')}
                           </div>
                         )}
                         <div className="text-sm font-semibold text-blue-600 border-t pt-1 mt-1">
-                          Total: ${totalAmount.toFixed(2)}
+                          {t('services.total')}: {formatCurrency(totalAmount)}
                         </div>
                       </div>
                       
@@ -516,14 +520,14 @@ export default function Services() {
                         {service.is_paid ? (
                           <div className="flex items-center text-green-600">
                             <CheckCircle className="mr-1 h-4 w-4" />
-                            <span className="text-sm">Pagado</span>
+                            <span className="text-sm">{t('services.paid')}</span>
                           </div>
                         ) : (
                           <Button
                             size="sm"
                             onClick={() => handleMarkAsPaid(service.id)}
                           >
-                            Marcar como Pagado
+                            {t('services.markAsPaid')}
                           </Button>
                         )}
                         <Button
@@ -557,35 +561,35 @@ export default function Services() {
                         <div className={`flex justify-between items-center transition-all duration-300 ${
                           isExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
                         }`} style={{ transitionDelay: isExpanded ? '100ms' : '0ms' }}>
-                          <span className="text-sm text-gray-600">Comisión:</span>
+                          <span className="text-sm text-gray-600">{t('services.commission')}:</span>
                           <span className="text-sm text-red-600 font-medium">
-                            -${service.commission_amount.toFixed(2)}
+                            -{formatCurrency(service.commission_amount)}
                           </span>
                         </div>
                         <div className={`flex justify-between items-center transition-all duration-300 ${
                           isExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
                         }`} style={{ transitionDelay: isExpanded ? '150ms' : '0ms' }}>
-                          <span className="text-sm text-gray-600">Neto:</span>
+                          <span className="text-sm text-gray-600">{t('services.net')}:</span>
                           <span className="text-sm font-medium">
-                            ${(service.amount - service.commission_amount).toFixed(2)}
+                            {formatCurrency(service.amount - service.commission_amount)}
                           </span>
                         </div>
                         {service.tip_amount && service.tip_amount > 0 && (
                           <div className={`flex justify-between items-center transition-all duration-300 ${
                             isExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
                           }`} style={{ transitionDelay: isExpanded ? '200ms' : '0ms' }}>
-                            <span className="text-sm text-gray-600">Propina:</span>
+                            <span className="text-sm text-gray-600">{t('services.tip')}:</span>
                             <span className="text-sm text-green-600 font-medium">
-                              +${service.tip_amount.toFixed(2)}
+                              +{formatCurrency(service.tip_amount)}
                             </span>
                           </div>
                         )}
                         <div className={`flex justify-between items-center border-t pt-2 transition-all duration-300 ${
                           isExpanded ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-2'
                         }`} style={{ transitionDelay: isExpanded ? '250ms' : '0ms' }}>
-                          <span className="text-sm font-semibold text-gray-800">Total Final:</span>
+                          <span className="text-sm font-semibold text-gray-800">{t('services.finalTotal')}:</span>
                           <span className="text-sm font-bold text-blue-600">
-                            ${totalAmount.toFixed(2)}
+                            {formatCurrency(totalAmount)}
                           </span>
                         </div>
                       </div>

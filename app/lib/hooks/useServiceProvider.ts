@@ -80,12 +80,40 @@ export function useServiceProvider() {
     }
   }
 
+  const updateLanguage = async (languageCode: string) => {
+    if (!serviceProvider) return
+    
+    const { error } = await supabase
+      .from('service_providers')
+      .update({ language_code: languageCode })
+      .eq('id', serviceProvider.id)
+    
+    if (!error) {
+      setServiceProvider({ ...serviceProvider, language_code: languageCode })
+    }
+  }
+
+  const updateCurrency = async (currencyCode: string) => {
+    if (!serviceProvider) return
+    
+    const { error } = await supabase
+      .from('service_providers')
+      .update({ currency_code: currencyCode })
+      .eq('id', serviceProvider.id)
+    
+    if (!error) {
+      setServiceProvider({ ...serviceProvider, currency_code: currencyCode })
+    }
+  }
+
   return {
     serviceProvider,
     loading,
     error,
     createServiceProvider,
     updateServiceProvider,
+    updateLanguage,
+    updateCurrency,
     refetch: fetchServiceProvider,
   }
 }

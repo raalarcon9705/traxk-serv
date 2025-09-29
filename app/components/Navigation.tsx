@@ -1,5 +1,6 @@
 import { Link, useLocation } from 'react-router'
 import { useAuth } from '~/lib/auth'
+import { useLanguage } from '~/lib/hooks/useLanguage'
 import { Button } from '~/components/ui/Button'
 import {
   Home,
@@ -19,13 +20,14 @@ interface NavigationProps {
 
 export function Navigation({ isOpen, onClose }: NavigationProps) {
   const { signOut } = useAuth()
+  const { t } = useLanguage()
   const location = useLocation()
 
   const navigation = [
-    { name: 'Dashboard', href: '/dashboard', icon: Home },
-    { name: 'Servicios', href: '/services', icon: Calendar },
-    { name: 'Clientes', href: '/clients', icon: Users },
-    { name: 'Reporte', href: '/report', icon: BarChart3 },
+    { name: t('navigation.dashboard'), href: '/dashboard', icon: Home },
+    { name: t('navigation.services'), href: '/services', icon: Calendar },
+    { name: t('navigation.clients'), href: '/clients', icon: Users },
+    { name: t('navigation.report'), href: '/report', icon: BarChart3 },
   ]
 
   const handleSignOut = async () => {
@@ -85,7 +87,7 @@ export function Navigation({ isOpen, onClose }: NavigationProps) {
                 )}
               >
                 <Settings className="mr-3 h-5 w-5 flex-shrink-0" />
-                Configuración
+                {t('navigation.settings')}
               </Link>
               </nav>
               <div className="border-t p-4" style={{ borderColor: 'hsl(var(--border))' }}>
@@ -95,7 +97,7 @@ export function Navigation({ isOpen, onClose }: NavigationProps) {
                   className="w-full justify-start"
                 >
                   <LogOut className="mr-3 h-5 w-5" />
-                  Cerrar Sesión
+                  {t('auth.signOut')}
                 </Button>
               </div>
             </div>
@@ -136,7 +138,7 @@ export function Navigation({ isOpen, onClose }: NavigationProps) {
                 )}
               >
                 <Settings className="mr-3 h-5 w-5 flex-shrink-0" />
-                Configuración
+                {t('navigation.settings')}
               </Link>
             </nav>
           </div>
@@ -147,7 +149,7 @@ export function Navigation({ isOpen, onClose }: NavigationProps) {
               className="flex-shrink-0 w-full group justify-start"
             >
               <LogOut className="mr-3 h-5 w-5" />
-              Cerrar Sesión
+              {t('auth.signOut')}
             </Button>
           </div>
         </div>

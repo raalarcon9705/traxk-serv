@@ -2,6 +2,8 @@ import { useAuth } from '~/lib/auth'
 import { useServiceProvider } from '~/lib/hooks/useServiceProvider'
 import { useServices } from '~/lib/hooks/useServices'
 import { useServiceHistory } from '~/lib/hooks/useServiceHistory'
+import { useLanguage } from '~/lib/hooks/useLanguage'
+import { useCurrency } from '~/lib/hooks/useCurrency'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '~/components/ui/Card'
 import { Button } from '~/components/ui/Button'
 import { Layout } from '~/components/Layout'
@@ -29,6 +31,8 @@ export default function Dashboard() {
   const { serviceProvider, loading: providerLoading } = useServiceProvider()
   const { services, loading: servicesLoading } = useServices()
   const { monthlyData, loading: historyLoading } = useServiceHistory()
+  const { t } = useLanguage()
+  const { formatCurrency } = useCurrency()
 
   // Current period stats
   const totalAmount = services.reduce((sum, service) => sum + service.amount + (service.tip_amount || 0), 0)
@@ -142,10 +146,10 @@ export default function Dashboard() {
         {/* Header */}
         <div className="mb-6 sm:mb-8">
           <h1 className="text-2xl sm:text-3xl font-bold text-dark-blue-900">
-            Panel Principal
+            {t('dashboard.title')}
           </h1>
           <p className="mt-1 sm:mt-2 text-dark-blue-600 text-sm sm:text-base">
-            Bienvenido, {serviceProvider.business_name || user?.email}
+            {t('dashboard.welcome')}, {serviceProvider.business_name || user?.email}
           </p>
         </div>
 
@@ -153,22 +157,22 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Resumen Financiero</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('dashboard.financialSummary')}</CardTitle>
               <DollarSign className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Pendiente por recibir:</span>
-                  <span className="text-lg font-bold text-orange-600">${pendingNet.toFixed(2)}</span>
+                  <span className="text-sm text-gray-600">{t('dashboard.pendingToReceive')}:</span>
+                  <span className="text-lg font-bold text-orange-600">{formatCurrency(pendingNet)}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Pagado este mes:</span>
-                  <span className="text-lg font-bold text-green-600">${currentMonthData.paid.toFixed(2)}</span>
+                  <span className="text-sm text-gray-600">{t('dashboard.paidThisMonth')}:</span>
+                  <span className="text-lg font-bold text-green-600">{formatCurrency(currentMonthData.paid)}</span>
                 </div>
                 <div className="flex justify-between items-center border-t pt-2">
-                  <span className="text-sm font-medium text-gray-800">Total del mes:</span>
-                  <span className="text-lg font-bold text-blue-600">${currentMonthData.total.toFixed(2)}</span>
+                  <span className="text-sm font-medium text-gray-800">{t('dashboard.monthlyTotal')}:</span>
+                  <span className="text-lg font-bold text-blue-600">{formatCurrency(currentMonthData.total)}</span>
                 </div>
               </div>
             </CardContent>
@@ -176,21 +180,21 @@ export default function Dashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Propinas y Comisiones</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('dashboard.tipsAndCommissions')}</CardTitle>
               <TrendingUp className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Propinas recibidas:</span>
-                  <span className="text-lg font-bold text-green-600">${totalTips.toFixed(2)}</span>
+                  <span className='text-sm text-gray-600'>{t('dashboard.tipsReceived')}:</span>
+                  <span className='text-lg font-bold text-green-600'>{formatCurrency(totalTips)}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Comisiones retenidas:</span>
-                  <span className="text-lg font-bold text-red-600">${totalCommission.toFixed(2)}</span>
+                  <span className='text-sm text-gray-600'>{t('dashboard.commissionsRetained')}:</span>
+                  <span className='text-lg font-bold text-red-600'>{formatCurrency(totalCommission)}</span>
                 </div>
-                <p className="text-xs text-muted-foreground mt-2">
-                  {serviceProvider.commission_rate}% retenido por el contratista
+                <p className='text-xs text-muted-foreground mt-2'>
+                  {serviceProvider.commission_rate}% {t('dashboard.commissionRate')}
                 </p>
               </div>
             </CardContent>
@@ -198,22 +202,22 @@ export default function Dashboard() {
 
           <Card>
             <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
-              <CardTitle className="text-sm font-medium">Estado de Servicios</CardTitle>
+              <CardTitle className="text-sm font-medium">{t('dashboard.serviceStatus')}</CardTitle>
               <Calendar className="h-4 w-4 text-muted-foreground" />
             </CardHeader>
             <CardContent>
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Servicios pendientes:</span>
-                  <span className="text-2xl font-bold text-orange-600">{pendingServices}</span>
+                  <span className='text-sm text-gray-600'>{t('dashboard.pendingServices')}:</span>
+                  <span className='text-2xl font-bold text-orange-600'>{pendingServices}</span>
                 </div>
                 <div className="flex justify-between items-center">
-                  <span className="text-sm text-gray-600">Servicios pagados:</span>
-                  <span className="text-2xl font-bold text-green-600">{paidServices}</span>
+                  <span className='text-sm text-gray-600'>{t('dashboard.paidServices')}:</span>
+                  <span className='text-2xl font-bold text-green-600'>{paidServices}</span>
                 </div>
                 <div className="flex justify-between items-center border-t pt-2">
-                  <span className="text-sm font-medium text-gray-800">Total servicios:</span>
-                  <span className="text-2xl font-bold text-blue-600">{services.length}</span>
+                  <span className='text-sm font-medium text-gray-800'>{t('dashboard.totalServices')}:</span>
+                  <span className='text-2xl font-bold text-blue-600'>{services.length}</span>
                 </div>
               </div>
             </CardContent>
@@ -224,28 +228,28 @@ export default function Dashboard() {
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6 mb-6 sm:mb-8">
           <Card>
             <CardHeader>
-              <CardTitle>Acciones Rápidas</CardTitle>
+              <CardTitle>{t('dashboard.quickActions')}</CardTitle>
               <CardDescription>
-                Gestiona tus servicios y clientes
+                {t('dashboard.manageServices')}
               </CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               <Link to="/services/new">
                 <Button className="w-full justify-start">
                   <Plus className="mr-2 h-4 w-4" />
-                  Agregar Servicio
+                  {t('dashboard.addService')}
                 </Button>
               </Link>
               <Link to="/report">
                 <Button variant="outline" className="w-full justify-start">
                   <BarChart3 className="mr-2 h-4 w-4" />
-                  Ver Reporte Mensual
+                  {t('dashboard.viewMonthlyReport')}
                 </Button>
               </Link>
               <Link to="/services">
                 <Button variant="outline" className="w-full justify-start">
                   <Calendar className="mr-2 h-4 w-4" />
-                  Ver Servicios
+                  {t('dashboard.viewServices')}
                 </Button>
               </Link>
             </CardContent>
@@ -261,15 +265,15 @@ export default function Dashboard() {
         {/* Recent Services */}
         <Card>
           <CardHeader>
-            <CardTitle>Servicios Recientes</CardTitle>
+            <CardTitle>{t('dashboard.recentServices')}</CardTitle>
             <CardDescription>
-              Últimos servicios registrados
+              {t('dashboard.lastServices')}
             </CardDescription>
           </CardHeader>
           <CardContent>
             {services.length === 0 ? (
               <p className="text-center text-gray-500 py-8">
-                No hay servicios registrados
+                {t('dashboard.noServices')}
               </p>
             ) : (
               <div className="space-y-4">
@@ -282,23 +286,23 @@ export default function Dashboard() {
                         </p>
                     </div>
                     <div className="text-right">
-                      <p className="font-semibold">${service.amount.toFixed(2)}</p>
+                      <p className="font-semibold">{formatCurrency(service.amount)}</p>
                       <p className="text-sm text-red-600">
-                        -${service.commission_amount.toFixed(2)} comisión
+                        -{formatCurrency(service.commission_amount)} {t('dashboard.commission')}
                       </p>
                       <p className="text-sm text-gray-600">
-                        Neto: ${(service.amount - service.commission_amount).toFixed(2)}
+                        {t('dashboard.net')}: {formatCurrency(service.amount - service.commission_amount)}
                       </p>
                       {service.tip_amount && service.tip_amount > 0 && (
                         <p className="text-sm text-green-600">
-                          +${service.tip_amount.toFixed(2)} propina
+                          +{formatCurrency(service.tip_amount)} {t('dashboard.tip')}
                         </p>
                       )}
                       <p className="text-sm font-semibold text-blue-600 border-t pt-1 mt-1">
-                        Total: ${(service.amount - service.commission_amount + (service.tip_amount || 0)).toFixed(2)}
+                        {t('dashboard.total')}: {formatCurrency(service.amount - service.commission_amount + (service.tip_amount || 0))}
                       </p>
                       <p className={`text-xs ${service.is_paid ? 'text-green-600' : 'text-orange-600'}`}>
-                        {service.is_paid ? 'Pagado' : 'Pendiente'}
+                        {service.is_paid ? t('dashboard.paid') : t('dashboard.pending')}
                       </p>
                     </div>
                   </div>
